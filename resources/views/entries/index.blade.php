@@ -18,7 +18,7 @@
                     <div class="mt-6">
                         @foreach($entries as $entry)
                             <div class="p-4 mb-4 border rounded">
-                                <h3 class="text-lg font-semibold">{{ $entry->name }}</h3>
+                                <h3 class="text-lg font-semibold">{{ $entry->entry_name }}</h3>
                                 <p>Changes remaining: {{ $entry->changes_remaining }}</p>
                                 <div class="mt-2">
                                   <a href="{{ route('entries.roster', $entry) }}" class="text-blue-600">

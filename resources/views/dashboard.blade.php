@@ -8,13 +8,13 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Overview Section -->
-            <x-card title="Your Overview">
+            <x-card >
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="bg-nfl-primary border border-nfl-primary/20 p-4 rounded-lg">
                         <div class="text-lg font-semibold text-white mb-4">Total Entries</div>
                         <div class="text-3xl font-bold text-white">{{ $entriesCount }} / 4</div>
                         @if($remainingEntries > 0)
-                            <a href="{{ route('entries.create') }}" 
+                            <a href="{{ route('entries.create') }}"
                                 class="inline-flex items-center justify-center px-4 py-2 bg-nfl-secondary text-white font-medium rounded-lg hover:bg-nfl-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-secondary/50 transition-colors mt-2">
                                 Add Entry (+{{ $remainingEntries }} remaining)
                             </a>
@@ -41,11 +41,11 @@
 
             <!-- Rest of the content... -->
             <!-- Entries Section -->
-            <x-card title="Your Entries" class="mt-6">
+            <x-card title="Entries" class="mt-6">
                 @if($entries->isEmpty())
                     <div class="text-center py-8">
                         <p class="text-gray-600 mb-4">You haven't created any entries yet.</p>
-                        <a href="{{ route('entries.create') }}" 
+                        <a href="{{ route('entries.create') }}"
                         class="inline-flex items-center justify-center px-4 py-2 bg-nfl-primary text-white font-medium rounded-lg hover:bg-nfl-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-primary/50 transition-colors mt-2">
                                 Create Your First Entry
                         </a>
@@ -58,7 +58,7 @@
                                     <h3 class="text-xl font-semibold">{{ $entry->entry_name }}</h3>
                                     <span class="text-lg font-bold">{{ $entry->total_points ?? 0 }} pts</span>
                                 </div>
-                                
+
                                 <div class="space-y-2">
                                     @foreach($entry->rosters as $roster)
                                         <div class="flex justify-between items-center">
@@ -70,14 +70,12 @@
                                         </div>
                                     @endforeach
                                 </div>
-                                
+
                                 <div class="mt-4 flex justify-between items-center">
                                     <span class="text-sm text-gray-600">
                                         Changes remaining: {{ $entry->changes_remaining }}
                                     </span>
-                                    <x-button href="{{ route('entries.roster', $entry) }}" variant="ghost">
-                                        Manage Roster
-                                    </x-button>
+                                    <a href="{{ route('entries.roster', $entry) }}" class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"> Manage Roster</a>
                                 </div>
                             </div>
                         @endforeach
@@ -91,7 +89,7 @@
                     @forelse($entries->flatMap->transactions->take(5) as $transaction)
                         <div class="flex justify-between items-center">
                             <div>
-                                Dropped {{ $transaction->droppedPlayer->name }} for 
+                                Dropped {{ $transaction->droppedPlayer->name }} for
                                 {{ $transaction->addedPlayer->name }}
                             </div>
                             <div class="text-sm text-gray-600">
@@ -110,7 +108,7 @@
                     @foreach($entries as $entry)
                         <div class="bg-white p-4 rounded-lg shadow">
                             <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-semibold">{{ $entry->name }}</h4>
+                                <h4 class="font-semibold">{{ $entry->entry_name }}</h4>
                                 <span class="text-lg font-bold">{{ number_format($entry->total_points, 1) }} pts</span>
                             </div>
                             <div class="space-y-2">

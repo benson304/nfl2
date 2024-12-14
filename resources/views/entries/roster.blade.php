@@ -1,8 +1,8 @@
 <x-app-layout>
 <!-- Dialog Component -->
-<div x-data="{ 
-    isOpen: false, 
-    type: '', 
+<div x-data="{
+    isOpen: false,
+    type: '',
     message: '',
     show(data) {
         this.type = data.type;
@@ -12,13 +12,13 @@
     hide() {
         this.isOpen = false;
     }
-}" 
+}"
 @showdialog.window="show($event.detail)"
 class="relative z-50">
-    
+
     <!-- Background overlay -->
-    <div x-show="isOpen" 
-         class="fixed inset-0 bg-black/30" 
+    <div x-show="isOpen"
+         class="fixed inset-0 bg-black/30"
          @click="hide()"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -29,7 +29,7 @@ class="relative z-50">
     </div>
 
     <!-- Dialog -->
-    <div x-show="isOpen" 
+    <div x-show="isOpen"
          class="fixed inset-0 z-10 overflow-y-auto"
          @click.away="hide()">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -41,7 +41,7 @@ class="relative z-50">
                  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                  class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                
+
                 <div class="sm:flex sm:items-start">
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <div class="mt-2">
@@ -52,10 +52,10 @@ class="relative z-50">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="button" 
-                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" 
+                    <button type="button"
+                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                             @click="hide()">
                         Close
                     </button>
@@ -70,15 +70,15 @@ class="relative z-50">
         Livewire.on('showDialog', (data) => {
             window.dispatchEvent(new CustomEvent('showdialog', { detail: data[0] }));
         });
-        
+
         Livewire.on('playerUpdated', () => {
             location.reload();
         });
     });
-</script> 
+</script>
 <x-slot name="header">
         <h2 class="text-2xl font-semibold leading-tight text-nfl-primary">
-            {{ __('Roster View') }}
+            {{ $entry->entry_name }}
         </h2>
     </x-slot>
 
@@ -86,7 +86,7 @@ class="relative z-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 <!-- Top Row Summary Cards -->
 <div class="grid grid-cols-3 gap-6 mb-8">
-    <!-- Total Points Card -->  
+    <!-- Total Points Card -->
     <div class="px-4 py-6 bg-nfl-background border rounded-lg shadow flex items-center justify-between">
         <h3 class="text-lg font-medium">Total Points</h3>
         <p class="mt-2 text-2xl font-bold">{{ $totalPoints }}</p>
@@ -197,10 +197,10 @@ class="relative z-50">
                         <td class="px-6 py-4 whitespace-nowrap text-center relative">
                             @if(!in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
                                 <div>
-                                    <livewire:player-selector 
-                                        :entry="$entry" 
+                                    <livewire:player-selector
+                                        :entry="$entry"
                                         :currentPlayerId="$player->id"
-                                        :rosterPosition="$player->pivot->roster_position" 
+                                        :rosterPosition="$player->pivot->roster_position"
                                         :key="'player-'.$player->id" />
                                 </div>
                             @else
