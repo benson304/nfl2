@@ -12,6 +12,9 @@
                         <a href="{{ route('entries.index') }}" class="rounded-md px-3 py-2 font-medium {{ Request::routeIs('entries.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">My Entries</a>
                         <a href="{{ route('standings.index') }}" class="rounded-md px-3 py-2 font-medium {{ Request::routeIs('standings.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">Standings</a>
                         <a href="{{ route('transactions.index') }}" class="rounded-md px-3 py-2 font-medium {{ Request::routeIs('transactions.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">Transactions</a>
+                        @if (Auth::user()->is_admin == 1)
+                        <a href="{{route('admin.dashboard')}}" class="rounded-md px-3 py-2 font-medium {{ Request::routeIs('admin.dashboard') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">{{ __('Admin Dashboard') }}</a>
+                         @endif      
                     </div>
                 </div>
             </div>
@@ -30,26 +33,20 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                                 onclick="event.preventDefault();
-                                                        this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                                @if (Auth::user()->is_admin)
-                                    <x-dropdown-link :href="route('admin.dashboard')">
-                                        {{ __('Admin Dashboard') }}
-                                    </x-dropdown-link>
-                                    @endif
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                @else
-                    <a href="{{ route('login') }}" class="text-white hover:text-gray-200 px-3 py-2">Log in</a>
-                    <a href="{{ route('register') }}" class="ml-4 text-white hover:text-gray-200 px-3 py-2">Register</a>
-                @endauth
-
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <x-dropdown-link :href="route('logout')"
+                         onclick="event.preventDefault();
+                                this.closest('form').submit();">
+            {{ __('Log Out') }}
+        </x-dropdown-link>
+    </form>
+</x-slot>
+    </x-dropdown>
+@else
+    <a href="{{ route('login') }}" class="text-white hover:text-gray-200 px-3 py-2">Log in</a>
+    <a href="{{ route('register') }}" class="ml-4 text-white hover:text-gray-200 px-3 py-2">Register</a>
+@endauth
 
 
             </div>
@@ -87,6 +84,10 @@
             <a href="{{ route('entries.index') }}" class="block rounded-md px-3 py-2 text-base font-medium {{ Request::routeIs('entries.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">My Entries</a>
             <a href="{{ route('standings.index') }}" class="block rounded-md px-3 py-2 text-base font-medium {{ Request::routeIs('standings.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">Standings</a>
             <a href="{{ route('transactions.index') }}" class="block rounded-md px-3 py-2 text-base font-medium {{ Request::routeIs('transactions.*') ? 'bg-blue-200 text-gray-700' : 'text-gray-300 hover:bg-gray-200 hover:text-gray-700' }}">Transactions</a>
+            @if (Auth::user()->is_admin == 1)
+            <a href="{{route('admin.dashboard')}}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">{{ __('Admin Dashboard') }}</a>
+            @endif      
+       
         </div>
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
@@ -98,10 +99,7 @@
             <div class="mt-3 space-y-1 px-2">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <a href="{{route('logout')}}" onclick="event.preventDefault(); this.closest('form').submit();" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">{{ __('Sign Out') }}</a>
-                    @if (Auth::user()->is_admin)
-                        <a href="{{route('admin.dashboard')}}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">{{ __('Admin Dashboard') }}</a>
-                    @endif
+                    <a href="{{route('logout')}}" onclick="event.preventDefault(); this.closest('form').submit();" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">{{ __('Sign Out') }}</a>                 
                 </form>
             </div>
         </div>
@@ -133,12 +131,12 @@
                                 <a href="{{ route('transactions.index') }}" :active="request()->routeIs('transactions.*')" class="nav-link text-white px-3 py-2 mt-4 rounded-md text-sm font-medium">
                                     {{ __('Transactions') }}
                                 </a>
-                            @endauth
-                            @if (Auth::user()->is_admin)
+                                @if (Auth::user()->is_admin == 1)
                                 <a href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.*')" class="nav-link text-white px-3 py-2 mt-4 rounded-md text-sm font-medium">
                                     {{ __('Admin Dashboard') }}
                                 </a>
                             @endif
+                            @endauth
                         </div>
                     </div>
 
