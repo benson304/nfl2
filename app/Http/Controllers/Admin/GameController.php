@@ -26,7 +26,7 @@ class GameController extends Controller
             ->orderBy('round')
             ->orderBy('kickoff')
             ->paginate(20);
-            
+
         return view('admin.games.index', compact('games'));
     }
     public function stats(Game $game)
@@ -34,7 +34,7 @@ class GameController extends Controller
         $playerStats = PlayerStats::where('game_id', $game->id)
             ->with(['player'])
             ->get();
-            
+
         return view('admin.games.stats', [
             'game' => $game,
             'playerStats' => $playerStats
@@ -63,7 +63,11 @@ class GameController extends Controller
         return redirect()->route('admin.games.show', $game)
             ->with('success', 'Game created successfully');
     }
-
+    public function show(Game $game)
+    {
+        $teams = Team::all();
+        return view('admin.games.show', compact('game', 'teams'));
+    }
     public function edit(Game $game)
     {
         $teams = Team::all();
@@ -72,6 +76,7 @@ class GameController extends Controller
 
     public function update(Request $request, Game $game)
     {
+
         $validated = $request->validate([
             'home_team_id' => 'sometimes|exists:teams,id',
             'away_team_id' => 'sometimes|exists:teams,id',
@@ -90,7 +95,7 @@ class GameController extends Controller
             }
         });
 
-        return redirect()->route('admin.games.show', $game)
+        return redirect()->route('admin.games.edit', $game)
             ->with('success', 'Game updated successfully');
     }
 
@@ -107,12 +112,12 @@ class GameController extends Controller
         $request->validate([
             'stats_file' => 'required|file|mimes:csv,txt'
         ]);
-    
+
         try {
             $path = $request->file('stats_file')->getRealPath();
             $data = array_map('str_getcsv', file($path));
             $headers = array_shift($data);
-    
+
             foreach ($data as $row) {
                 PlayerStats::updateOrCreate(
                     [
@@ -124,7 +129,7 @@ class GameController extends Controller
                     ]
                 );
             }
-    
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
@@ -145,18 +150,18 @@ class GameController extends Controller
     DB::transaction(function () use ($validated) {
         foreach ($validated['stats'] as $gameId => $stats) {
             $game = Game::findOrFail($gameId);
-            
+
             // Parse the stat name and find the corresponding player
             $statParts = explode('_', $stats['name']);
             $playerId = $statParts[0];
             $statType = implode('_', array_slice($statParts, 1));
-            
+
             // Update or create the player stats
             $playerStats = PlayerStats::firstOrCreate([
                 'game_id' => $game->id,
                 'player_id' => $playerId
             ]);
-            
+
             // Update the specific stat
             $playerStats->update([
                 $statType => $stats['value']
@@ -180,10 +185,10 @@ class GameController extends Controller
     {
         // Update team playoff statuses if needed
         if ($game->round !== 'Super Bowl') {
-            $losingTeam = $game->home_score > $game->away_score 
-                ? $game->awayTeam 
+            $losingTeam = $game->home_score > $game->away_score
+                ? $game->awayTeam
                 : $game->homeTeam;
-                
+
             $losingTeam->update(['is_playoff_team' => false]);
         }
 
@@ -203,10 +208,10 @@ class GameController extends Controller
             ->pluck('entry_id')
             ->unique();
 
-        // Update entry points 
+        // Update entry points
         foreach ($affectedEntries as $entryId) {
             $entry = Entry::find($entryId);
             $entry->updateTotalPoints();
         }
     }
-} 
+}

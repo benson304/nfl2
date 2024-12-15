@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Player Stats') }}
             </h2>
-            <a href="{{ route('admin.player-stats.create') }}" 
+            <a href="{{ route('admin.player-stats.create') }}"
                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Add New Player Stat
             </a>
@@ -12,7 +12,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <table class="min-w-full">
@@ -51,12 +51,12 @@
                                     <td class="px-2 py-4 whitespace-nowrap border-b border-gray-200">{{ $stat->fumbles_lost }}</td>
                                     <td class="px-2 py-4 whitespace-nowrap border-b border-gray-200">{{ $stat->offensive_fumble_return_td }}</td>
                                     <td class="px-2 py-4 whitespace-nowrap text-right border-b border-gray-200">
-                                        <a href="{{ route('admin.player-stats.edit', $stat) }}" 
+                                        <a href="{{ route('admin.player-stats.edit', $stat) }}"
                                            class="text-blue-600 hover:text-blue-900 mr-4">Edit</a>
                                         <form action="{{ route('admin.player-stats.destroy', $stat) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="text-red-600 hover:text-red-900"
                                                     onclick="return confirm('Are you sure?')">
                                                 Delete
