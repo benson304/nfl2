@@ -1,9 +1,4 @@
 <x-admin-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Admin Dashboard') }}
-        </h2>
-    </x-slot>
 
     <div class="max-w-7xl mx-auto">
         <!-- Overview Stats -->
@@ -108,7 +103,7 @@ class="inline-flex items-center justify-center px-4 py-2 bg-purple-600 border bo
                         @foreach(\App\Models\Transaction::latest()->take(5)->get() as $transaction)
                             <div class="border-l-4 border-blue-400 pl-4">
                                 <div class="text-sm font-medium text-gray-900">
-                                    {{ $transaction->entry->user->name }} - {{ $transaction->entry->name }}
+                                    {{ $transaction->entry->user->name }} - {{ $transaction->entry->entry_name }}
                                 </div>
                                 <div class="text-sm text-gray-500">
                                 Dropped: {{ $transaction->droppedPlayer->name ?? 'Unknown Player' }} for {{ $transaction->addedPlayer->name ?? 'Unknown Player' }}
