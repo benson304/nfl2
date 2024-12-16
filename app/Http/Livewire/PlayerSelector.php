@@ -2,10 +2,12 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Game;
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Player;
 use App\Models\PlayerChangeHistory;
-use App\Models\Transaction; 
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 
 class PlayerSelector extends Component
@@ -51,7 +53,7 @@ class PlayerSelector extends Component
     $this->players = Player::where(function($query) {
             if ($this->rosterPosition === 'QB') {
                 $query->where('position', 'QB');
-            } 
+            }
             elseif (str_starts_with($this->rosterPosition, 'RB')) {
                 $query->where('position', 'RB');
             }
@@ -117,13 +119,13 @@ class PlayerSelector extends Component
         try {
             \DB::transaction(function () {
                 $now = now();
-    
+
                 // Get the current player data before detaching
                 $currentPlayerPivot = $this->entry->players()
                     ->where('players.id', $this->currentPlayerId)
                     ->first()
                     ->pivot;
-        
+
                 // Save to entry_player_history before detaching (for stats tracking)
                 DB::table('entry_player_history')->insert([
                     'entry_id' => $this->entry->id,
@@ -138,13 +140,13 @@ class PlayerSelector extends Component
                     'created_at' => $now,
                     'updated_at' => $now
                 ]);
-        
+
                 // Detach and attach players
                 $this->entry->players()->detach($this->currentPlayerId);
                 $this->entry->players()->attach($this->selectedPlayerId, [
                     'roster_position' => $this->rosterPosition
                 ]);
-    
+
                 // Create single transaction record
                 Transaction::create([
                     'entry_id' => $this->entry->id,
@@ -153,16 +155,19 @@ class PlayerSelector extends Component
                     'roster_position' => $this->rosterPosition,
                     'processed_at' => $now
                 ]);
-    
-                $this->entry->decrement('changes_remaining');
+
+                //if any games started decrease changes remaining. If no games started unlimited changes allowed.
+                if($gamesStarted = Game::where('kickoff', '<=', Carbon::now())->first()) {
+                    $this->entry->decrement('changes_remaining');
+                }
             });
-    
+
             $this->dispatch('showDialog', [
                 'type' => 'success',
                 'message' => 'Player changed successfully'
             ]);
             $this->dispatch('playerUpdated');
-    
+
         } catch (\Exception $e) {
             $this->dispatch('showDialog', [
                 'type' => 'error',
