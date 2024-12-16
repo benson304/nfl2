@@ -156,7 +156,7 @@ class PlayerSelector extends Component
                     'processed_at' => $now
                 ]);
 
-                //if any games started decrease changes remaining. If no games started unlimited changes allowed.
+                //if any games started decrease changes remaining.   If no games started unlimited changes allowed.
                 if($gamesStarted = Game::where('kickoff', '<=', Carbon::now())->first()) {
                     $this->entry->decrement('changes_remaining');
                 }
