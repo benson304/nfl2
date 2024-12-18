@@ -93,7 +93,7 @@ class PlayerSelector extends Component
             return;
         }
 
-        if ($this->entry->changes_remaining <= 0) {
+        if ($this->entry->getChangesRemaining() <= 0) {
             $this->dispatch('showDialog', [
                 'type' => 'error',
                 'message' => 'No changes remaining'
@@ -163,14 +163,14 @@ class PlayerSelector extends Component
 //                    'roster_position' => $this->rosterPosition
 //                ]);
 //
-//                // Create single transaction record
-//                Transaction::create([
-//                    'entry_id' => $this->entry->id,
-//                    'dropped_player_id' => $this->currentPlayerId,
-//                    'added_player_id' => $this->selectedPlayerId,
-//                    'roster_position' => $this->rosterPosition,
-//                    'processed_at' => $now
-//                ]);
+                // Create single transaction record
+                Transaction::create([
+                    'entry_id' => $this->entry->id,
+                    'dropped_player_id' => $this->currentPlayerId,
+                    'added_player_id' => $this->selectedPlayerId,
+                    'roster_position' => $this->rosterPosition,
+                    'processed_at' => $now
+                ]);
 
                 //if any games started decrease changes remaining.   If no games started unlimited changes allowed.
                 if($gamesStarted = Game::where('kickoff', '<=', Carbon::now())->first()) {

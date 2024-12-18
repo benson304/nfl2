@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'entry_id',
         'dropped_player_id',
@@ -16,9 +19,8 @@ class Transaction extends Model
         'notes'
     ];
 
-    protected $dates = [
-        'processed_at'
-    ];
+    protected $dates = ['deleted_at','processed_at'];
+
 
     // Update the $with array to use consistent naming
     protected $with = ['entry', 'droppedPlayer', 'addedPlayer'];

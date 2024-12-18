@@ -199,7 +199,7 @@ class EntryController extends Controller
             }
 
         }
-
+//dd($transactions);
         $playersActive = $entry->current_players()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
             $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
         })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');
@@ -225,6 +225,7 @@ class EntryController extends Controller
         $transaction=Transaction::findOrFail($request->input('transaction_id'));
         EntryPlayer::where('entry_id',$transaction->entry_id)->where('player_id',$transaction->dropped_player_id)->update(['removed_at' => NULL]);
         EntryPlayer::where('entry_id',$transaction->entry_id)->where('player_id',$transaction->added_player_id)->delete();
+        $transaction->delete();
         return redirect()->back()->with('success', 'Player change cancelled.');
     }
 
