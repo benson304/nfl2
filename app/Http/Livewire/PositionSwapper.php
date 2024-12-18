@@ -19,29 +19,31 @@ class PositionSwapper extends Component
         $this->rosterPosition = $rosterPosition;
     }
 
-    public function swapPosition()
+    public function swapPlayer()
     {
         if (!$this->swapWithId) {
-            $this->emit('showDialog', ['type' => 'error', 'message' => 'Please select a player to swap with']);
+            $this->dispatch('showDialog', ['type' => 'error', 'message' => 'Please select a player to swap with']);
             return;
         }
 
+
         try {
             $response = $this->entry->swapWithFlex($this->currentPlayerId, $this->swapWithId);
-            $this->emit('showDialog', ['type' => 'success', 'message' => 'Positions successfully swapped']);
-            $this->emit('playerUpdated');
+            $this->dispatch('showDialog', ['type' => 'success', 'message' => 'Positions successfully swapped']);
+            $this->dispatch('playerUpdated');
         } catch (\Exception $e) {
-            $this->emit('showDialog', ['type' => 'error', 'message' => $e->getMessage()]);
+            $this->dispatch('showDialog', ['type' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
     public function render()
     {
+
         $eligiblePlayers = $this->entry->current_players()
             ->whereNull('entry_player.removed_at')
             ->where(function ($query) {
                 $query->where('roster_position', 'FLEX')
-                    ->orWhereIn('position', ['RB', 'WR', 'TE']);
+                    ->orWhere('position', Player::whereId($this->currentPlayerId)->pluck('position')->firstOrFail());
             })
             ->where('players.id', '!=', $this->currentPlayerId)
             ->get();

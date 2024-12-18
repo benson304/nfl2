@@ -152,7 +152,7 @@
                                 </div>
 
                                 @endif
-                                    @if(is_null($player->pivot->removed_at) && !in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
+                                    @if($player->pivot->roster_position=='FLEX'&&is_null($player->pivot->removed_at) && !in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
                                         <div>
                                             <livewire:position-swapper
                                                 :entry="$entry"
