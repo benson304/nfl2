@@ -18,7 +18,8 @@ class EntryPlayer extends Pivot
         'divisional_points',
         'conference_points',
         'superbowl_points',
-        'total_points'
+        'total_points',
+        'removed_at'
     ];
 
     public static function boot()

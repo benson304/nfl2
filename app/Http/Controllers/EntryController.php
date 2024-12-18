@@ -179,14 +179,27 @@ class EntryController extends Controller
             });
 
 
-        $revertChangeData = EntryPlayer::selectRaw('ep2.player_id as cID, max(ep2.created_at) as created_at, Min(games.kickoff) as kickoff')
-            ->leftJoin('entry_player AS ep2', 'entry_player.removed_at', '=', 'ep2.created_at')
-            ->leftJoin('players', 'ep2.player_id', '=', 'players.id')
-            ->leftJoin('teams', 'players.team_id', '=', 'teams.id')
-            ->leftJoin('games',function($join) {
-            $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and games.kickoff>ep2.created_at '),'=',\DB::raw('1'));
-        })->where('entry_player.entry_id',$entry->id)->whereNotNull('entry_player.removed_at')->where('kickoff','>',now())->groupBy('ep2.player_id')->get();
-//
+        //Get kickoff of new players game
+        $revokeableChanges=collect();
+        $transactions=$entry->transactions()->get();
+        $transactions = $transactions->map(function ($item) {
+            $item->revoke = true;
+            return $item;
+        });
+        foreach($transactions as $transaction) {
+            $revokeableChanges->push($transaction->dropped_player_id);
+            //If next game after transaction has started disable revoking
+            if($transaction->addedPlayer->games()->where('kickoff','>',$transaction->created_at)->count()>0 &&
+                $transaction->addedPlayer->games()->where('kickoff','>',$transaction->created_at)->first()->kickoff<now()){
+                $transaction->revoke=false;
+            }
+            //If player was dropped again disable revoking.
+            if($transactions->contains('dropped_player_id',$transaction->added_player_id)) {
+                $transaction->revoke=false;
+            }
+
+        }
+
         $playersActive = $entry->current_players()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
             $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
         })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');
@@ -202,8 +215,17 @@ class EntryController extends Controller
             'historicalPlayers' => $historicalPlayers,
             'playersActive' => $playersActive,
             'changesRemaining' => $changesRemaining,
-            'revertChangeData' => $revertChangeData
+            'transactions' => $transactions
         ]);
+    }
+
+    public function revertPlayer(Request $request)
+    {
+        //TODO: verify user has auth to make these changes!
+        $transaction=Transaction::findOrFail($request->input('transaction_id'));
+        EntryPlayer::where('entry_id',$transaction->entry_id)->where('player_id',$transaction->dropped_player_id)->update(['removed_at' => NULL]);
+        EntryPlayer::where('entry_id',$transaction->entry_id)->where('player_id',$transaction->added_player_id)->delete();
+        return redirect()->back()->with('success', 'Player change cancelled.');
     }
 
     public function store(Request $request)

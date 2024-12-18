@@ -151,15 +151,20 @@
                             @elseif(is_null($player->pivot->removed_at))
                                 <span class="text-red-500">Locked</span>
                             @else
-                                @if($revertChangeData->contains('cID',$player->id))
-                                    <button type="button" disabled
+                                @if($transactions->firstWhere('dropped_player_id',$player->id)->revoke===true)
+                                <form method="POST" action="{{ route('entries.revert-player', $entry) }}">
+                                    <input type="hidden" id="transaction_id" name="transaction_id" value="{{$transactions->firstWhere('dropped_player_id',$player->id)->id}}" />
+                                    @csrf
+
+                                    <button type="submit"
                                             class="px-3 py-1 cursor-pointer text-sm text-white bg-red-600 rounded">
-                                        Undo Changed
+                                        Cancel Change
                                     </button>
-                                @else
-                                    <span class="text-red-500"></span>
-                                @endif
+                                </form>
+                                    @endif
+
                             @endif
+
                         </td>
                     </tr>
                 @endforeach

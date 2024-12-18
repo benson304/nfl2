@@ -30,6 +30,40 @@ class Player extends Model
         return $this->belongsTo(Team::class);
     }
 
+    public function games()
+    {
+        $gamesHome = $this->home_games;
+        $gamesAway = $this->away_games;
+        // Merge collections and return single collection.
+        return $gamesHome->merge($gamesAway);
+    }
+
+
+
+    public function home_games()
+    {
+        return $this->hasManyThrough(
+            Game::class,
+            Team::class,
+            'id', // Foreign key on the environments table...
+            'home_team_id', // Foreign key on the deployments table...
+            'team_id', // Local key on the projects table...
+            'id' // Local key on the environments table...
+        );
+    }
+
+    public function away_games()
+    {
+        return $this->hasManyThrough(
+            Game::class,
+            Team::class,
+            'id', // Foreign key on the environments table...
+            'away_team_id', // Foreign key on the deployments table...
+            'team_id', // Local key on the projects table...
+            'id' // Local key on the environments table...
+        );
+    }
+
     public function stats(): HasMany
     {
         return $this->hasMany(PlayerStats::class);
