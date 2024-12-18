@@ -228,7 +228,82 @@ class EntryController extends Controller
         $transaction->delete();
         return redirect()->back()->with('success', 'Player change cancelled.');
     }
+    public function swapWithFlex(Request $request, Entry $entry)
+    {
+        if ($entry->user_id !== auth()->id()) {
+            abort(403);
+        }
 
+        $validated = $request->validate([
+            'player1_id' => 'required|exists:players,id',
+            'player2_id' => 'required|exists:players,id',
+        ]);
+
+        // Get both players
+        $player1 = EntryPlayer::where('entry_id', $entry->id)
+            ->where('player_id', $validated['player1_id'])
+            ->whereNull('removed_at')
+            ->firstOrFail();
+
+        $player2 = EntryPlayer::where('entry_id', $entry->id)
+            ->where('player_id', $validated['player2_id'])
+            ->whereNull('removed_at')
+            ->firstOrFail();
+
+        // Verify one position is FLEX
+        if (!in_array('FLEX', [$player1->roster_position, $player2->roster_position])) {
+            return back()->withErrors(['message' => 'One position must be FLEX to swap']);
+        }
+
+        // Get the player details
+        $p1 = Player::findOrFail($validated['player1_id']);
+        $p2 = Player::findOrFail($validated['player2_id']);
+
+        // Verify the non-FLEX player can be placed in FLEX (RB/WR/TE only)
+        if ($player1->roster_position === 'FLEX') {
+            if (!in_array($p2->position, ['RB', 'WR', 'TE'])) {
+                return back()->withErrors(['message' => 'Only RB/WR/TE positions can be moved to FLEX']);
+            }
+        } else {
+            if (!in_array($p1->position, ['RB', 'WR', 'TE'])) {
+                return back()->withErrors(['message' => 'Only RB/WR/TE positions can be moved to FLEX']);
+            }
+        }
+
+        // Check if either player is locked
+        $lockedPlayers = collect();
+        if($upcomingGames = Game::where('kickoff', '>=', now())
+            ->where('kickoff', '<=', now()->addDays(2))
+            ->first()) {
+            foreach ([$p1, $p2] as $player) {
+                $currentGame = Game::where(function ($query) use ($player) {
+                    $query->where('home_team_id', $player->team_id)
+                        ->orWhere('away_team_id', $player->team_id);
+                })
+                    ->where('kickoff', '<=', now())
+                    ->where('kickoff', '>=', now()->subDays(2))
+                    ->first();
+
+                if ($currentGame) {
+                    $lockedPlayers->push($player);
+                }
+            }
+        }
+
+        if ($lockedPlayers->count() > 0) {
+            return back()->withErrors(['message' => 'Cannot swap locked players']);
+        }
+
+        // Perform the swap
+        $temp = $player1->roster_position;
+        $player1->roster_position = $player2->roster_position;
+        $player2->roster_position = $temp;
+
+        $player1->save();
+        $player2->save();
+
+        return back()->with('success', 'Positions successfully swapped');
+    }
     public function store(Request $request)
     {
         $user = auth()->user();

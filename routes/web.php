@@ -61,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/entries/{entry}/add-player', [EntryController::class, 'addPlayer'])->name('entries.add-player');
     Route::post('/entries/{entry}/revert-player', [EntryController::class, 'revertPlayer'])->name('entries.revert-player');
     Route::post('/entries/{entry}/transactions', [EntryController::class, 'processTransaction'])->name('entries.process-transaction');
+    Route::post('/entries/{entry}/swap-flex', [EntryController::class, 'swapWithFlex'])->name('entries.swap-flex');
 
     // Standings routes
     Route::get('/standings', [StandingsController::class, 'index'])->name('standings.index');

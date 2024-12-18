@@ -150,7 +150,17 @@
                                         :rosterPosition="$player->pivot->roster_position"
                                         :key="'player-'.$player->id" />
                                 </div>
+
                                 @endif
+                                    @if(is_null($player->pivot->removed_at) && !in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
+                                        <div>
+                                            <livewire:position-swapper
+                                                :entry="$entry"
+                                                :currentPlayerId="$player->id"
+                                                :rosterPosition="$player->pivot->roster_position"
+                                                :key="'swap-'.$player->id" />
+                                        </div>
+                                    @endif
                             @elseif(is_null($player->pivot->removed_at))
                                 <span class="text-red-500">Locked</span>
                             @else
