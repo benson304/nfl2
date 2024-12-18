@@ -1,5 +1,5 @@
-<div 
-    x-data="{ 
+<div
+    x-data="{
         showDropdown: false,
         showDialog: false,
         dialogType: '',
@@ -14,18 +14,18 @@
     }"
     class="relative"
 >
-    <button 
+    <button
         @click="showDropdown = !showDropdown"
         class="px-3 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
         Change Player
     </button>
-    
+
     <!-- Dialog Modal -->
-    <div x-show="showDialog" 
+    <div x-show="showDialog"
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
-         aria-labelledby="modal-title" 
-         role="dialog" 
+         class="fixed inset-0 z-50 overflow-y-auto"
+         aria-labelledby="modal-title"
+         role="dialog"
          aria-modal="true"
          style="display: flex; items: center; justify-content: center;">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
@@ -69,15 +69,16 @@
     </div>
 
     <!-- Player Selection Dropdown -->
-    <div 
-    x-show="showDropdown" 
+    <div
+        x-cloak
+    x-show="showDropdown"
     @click.away="showDropdown = false"
     class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-[60] border"
     style="transform: translateX(-50%);">
         <div class="p-4">
             <form wire:submit="changePlayer">
-                <select 
-                    wire:model="selectedPlayerId" 
+                <select
+                    wire:model="selectedPlayerId"
                     class="w-full rounded-md border-gray-300 text-sm mb-4"
                     required
                 >
@@ -88,15 +89,15 @@
                         </option>
                     @endforeach
                 </select>
-                
+
                 <div class="flex justify-end space-x-2">
-                    <button 
+                    <button
                         type="button"
                         @click="showDropdown = false"
                         class="px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded hover:bg-gray-200">
                         Cancel
                     </button>
-                    <button 
+                    <button
                         type="submit"
                         class="px-3 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
                         Confirm Change

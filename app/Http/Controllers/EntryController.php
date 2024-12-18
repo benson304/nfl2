@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Entry;
 use App\Models\Player;
 use App\Models\Game;
-use App\Models\Transaction; 
+use App\Models\Transaction;
 use App\Models\EntryPlayer;
 use Closure;
 use Illuminate\Http\Request;
@@ -116,6 +116,7 @@ class EntryController extends Controller
 
     public function roster(Entry $entry)
     {
+
         if ($entry->user_id !== auth()->id()) {
             abort(403);
         }
@@ -177,8 +178,20 @@ class EntryController extends Controller
                 ];
             });
 
-        $playersActive = $entry->players->count();
-        $changesRemaining = $entry->changes_remaining;
+
+        $revertChangeData = EntryPlayer::selectRaw('ep2.player_id as cID, max(ep2.created_at) as created_at, Min(games.kickoff) as kickoff')
+            ->leftJoin('entry_player AS ep2', 'entry_player.removed_at', '=', 'ep2.created_at')
+            ->leftJoin('players', 'ep2.player_id', '=', 'players.id')
+            ->leftJoin('teams', 'players.team_id', '=', 'teams.id')
+            ->leftJoin('games',function($join) {
+            $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and games.kickoff>ep2.created_at '),'=',\DB::raw('1'));
+        })->where('entry_player.entry_id',$entry->id)->whereNotNull('entry_player.removed_at')->where('kickoff','>',now())->groupBy('ep2.player_id')->get();
+
+        $playersActive = $entry->current_players()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
+            $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
+        })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');
+
+       $changesRemaining = $entry->getChangesRemaining();
 
         return view('entries.roster', [
             'entry' => $entry->load('players.team'),
@@ -188,7 +201,8 @@ class EntryController extends Controller
             'lockedPlayers' => $lockedPlayers,
             'historicalPlayers' => $historicalPlayers,
             'playersActive' => $playersActive,
-            'changesRemaining' => $changesRemaining
+            'changesRemaining' => $changesRemaining,
+            'revertChangeData' => $revertChangeData
         ]);
     }
 

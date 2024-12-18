@@ -1,69 +1,4 @@
 <x-app-layout>
-<!-- Dialog Component -->
-<div x-data="{
-    isOpen: false,
-    type: '',
-    message: '',
-    show(data) {
-        this.type = data.type;
-        this.message = data.message;
-        this.isOpen = true;
-    },
-    hide() {
-        this.isOpen = false;
-    }
-}"
-@showdialog.window="show($event.detail)"
-class="relative z-50">
-
-    <!-- Background overlay -->
-    <div x-show="isOpen"
-         class="fixed inset-0 bg-black/30"
-         @click="hide()"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0">
-    </div>
-
-    <!-- Dialog -->
-    <div x-show="isOpen"
-         class="fixed inset-0 z-10 overflow-y-auto"
-         @click.away="hide()">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div x-show="isOpen"
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <div class="mt-2">
-                            <p x-text="message" :class="{
-                                'text-red-500': type === 'error',
-                                'text-green-500': type === 'success'
-                            }" class="text-sm"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="button"
-                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                            @click="hide()">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     document.addEventListener('livewire:initialized', function () {
@@ -95,13 +30,13 @@ class="relative z-50">
     <!-- Changes Remaining Card -->
     <div class="px-4 py-6 bg-nfl-background border rounded-lg shadow flex items-center justify-between">
         <h3 class="text-lg font-medium">Changes Remaining</h3>
-        <p class="mt-2 text-2xl font-bold">{{ $changesRemaining }} / 2</p>
+        <p class="mt-2 text-2xl font-bold">{{ $entry->getChangesRemaining() }} / 2</p>
     </div>
 
     <!-- Players Active Card -->
     <div class="px-4 py-6 bg-nfl-background border rounded-lg shadow flex items-center justify-between">
         <h3 class="text-lg font-medium">Players Active</h3>
-        <p class="mt-2 text-2xl font-bold">{{ $playersActive }} / 8</p>
+        <p class="mt-2 text-2xl font-bold">{{ $playersActive->count() }} / 8</p>
     </div>
 </div>
 
@@ -171,20 +106,23 @@ class="relative z-50">
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-            @foreach($entry->current_players->sortBy(function($player) {
-    $positionOrder = [
-        'QB' => 1,
-        'WR1' => 2,
-        'WR2' => 3,
-        'WR3' => 4,
-        'RB1' => 5,
-        'RB2' => 6,
-        'TE' => 7,
-        'FLEX' => 8
-    ];
-    return $positionOrder[$player->pivot->roster_position] ?? 999;
-})->sortBy('pivot.removed_at') as $player)
-                    <tr class="text-center {{!is_null($player->pivot->removed_at)?' bg-red-200':''}}" x-data="{ showDropdown: false, loading: false }">
+            @foreach($entry->players->sortBy(function($player) {
+                $positionOrder = [
+                    'QB' => 1,
+                    'WR1' => 2,
+                    'WR2' => 3,
+                    'WR3' => 4,
+                    'RB1' => 5,
+                    'RB2' => 6,
+                    'TE' => 7,
+                    'FLEX' => 8
+                ];
+                return $positionOrder[$player->pivot->roster_position] ?? 999;
+            })->sortBy(function($player) {
+                return is_null($player->pivot->removed_at) ?0 :1;
+            }) as $player)
+
+                    <tr class="text-center {{!is_null($player->pivot->removed_at)?' bg-red-200':(!$playersActive->contains($player->id)?'bg-gray-200':'')}}" x-data="{ showDropdown: false, loading: false }">
                         <td class="px-6 py-4 whitespace-nowrap capitalize">{{ $player->pivot->roster_position }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             {{ $player->name }} ({{ $player->team->name }})
@@ -196,6 +134,12 @@ class="relative z-50">
                         <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($player->pivot->total_points, 1):''  }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-center relative">
                             @if(is_null($player->pivot->removed_at)&&!in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
+                                @if($changesRemaining<=0)
+                                    <button type="button" disabled
+                                            class="px-3 py-1 cursor-not-allowed text-sm text-white bg-blue-300 rounded">
+                                        Change Player
+                                    </button>
+                                @else
                                 <div>
                                     <livewire:player-selector
                                         :entry="$entry"
@@ -203,8 +147,18 @@ class="relative z-50">
                                         :rosterPosition="$player->pivot->roster_position"
                                         :key="'player-'.$player->id" />
                                 </div>
-                            @else
+                                @endif
+                            @elseif(is_null($player->pivot->removed_at))
                                 <span class="text-red-500">Locked</span>
+                            @else
+                                @if($revertChangeData->contains('cID',$player->id))
+                                    <button type="button" disabled
+                                            class="px-3 py-1 cursor-pointer text-sm text-white bg-red-600 rounded">
+                                        Undo Changed
+                                    </button>
+                                @else
+                                    <span class="text-red-500"></span>
+                                @endif
                             @endif
                         </td>
                     </tr>

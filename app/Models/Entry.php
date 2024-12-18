@@ -69,9 +69,18 @@ class Entry extends Model
     }
     public function current_players(): BelongsToMany
     {
-        //->whereNull('entry_player.removed_at')
         return $this->belongsToMany(Player::class, 'entry_player')
             ->using(EntryPlayer::class)
+            ->whereNull('entry_player.removed_at')
+            ->withPivot('roster_position')
+            ->withPivot('removed_at')
+            ->withTimestamps();
+    }
+    public function changed_players(): BelongsToMany
+    {
+        return $this->belongsToMany(Player::class, 'entry_player')
+            ->using(EntryPlayer::class)
+            ->whereNotNull('entry_player.removed_at')
             ->withPivot('roster_position')
             ->withPivot('removed_at')
             ->withTimestamps();
@@ -80,7 +89,10 @@ class Entry extends Model
     {
         return $this->hasMany(EntryPlayer::class);
     }
-
+    public function getChangesRemaining(): float
+    {
+        return (10-$this->playerList()->count());
+    }
     public function players(): BelongsToMany
     {
         return $this->belongsToMany(Player::class, 'entry_player')
