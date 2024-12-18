@@ -30,6 +30,7 @@ class PositionSwapper extends Component
         try {
             $response = $this->entry->swapWithFlex($this->currentPlayerId, $this->swapWithId);
             $this->dispatch('showDialog', ['type' => 'success', 'message' => 'Positions successfully swapped']);
+            $this->dispatch('hideDropdown');
             $this->dispatch('playerUpdated');
         } catch (\Exception $e) {
             $this->dispatch('showDialog', ['type' => 'error', 'message' => $e->getMessage()]);

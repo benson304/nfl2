@@ -21,6 +21,7 @@
                 <div class="p-6 text-gray-900">
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold mb-2">Total Points: {{ $totalPoints }}</h3>
+                        <h3 class="text-lg font-semibold mb-2">Changes Remaining: {{ $entry->getChangesRemaining() }}</h3>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -34,7 +35,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($entry->players as $player)
+                                @foreach($entry->current_players as $player)
                                     <tr class="border-b">
                                         <td class="px-4 py-2">{{ $player->pivot->roster_position }}</td>
                                         <td class="px-4 py-2">{{ $player->name }}</td>

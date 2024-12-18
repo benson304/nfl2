@@ -449,7 +449,7 @@ class EntryController extends Controller
 
     public function publicRoster(Entry $entry)
     {
-        $entry->load(['players' => function($query) {
+        $entry->load(['current_players' => function($query) {
             $query->with('team')->select('players.*');
         }]);
 

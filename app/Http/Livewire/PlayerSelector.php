@@ -182,6 +182,7 @@ class PlayerSelector extends Component
                 'type' => 'success',
                 'message' => 'Player changed successfully'
             ]);
+            $this->dispatch('hideDropdown');
             $this->dispatch('playerUpdated');
 
         } catch (\Exception $e) {

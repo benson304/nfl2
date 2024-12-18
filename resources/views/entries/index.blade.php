@@ -19,7 +19,7 @@
                         @foreach($entries as $entry)
                             <div class="p-4 mb-4 border rounded">
                                 <h3 class="text-lg font-semibold">{{ $entry->entry_name }}</h3>
-                                <p>Changes remaining: {{ $entry->changes_remaining }}</p>
+                                <p>Changes remaining: {{ $entry->getChangesRemaining() }}</p>
                                 <div class="mt-2 inline-flex -space-x-px overflow-hidden rounded-md border bg-nfl-secondary shadow-sm">
                                   <a href="{{ route('entries.roster', $entry) }}" class="inline-block px-4 py-2 text-sm font-medium text-white hover:bg-nfl-primary focus:relative">
                                       View Details

@@ -10,6 +10,9 @@
                 this.dialogMessage = data[0].message;
                 this.showDialog = true;
             });
+            this.$wire.on('hideDropdown', (data) => {
+                this.showDropdown = false;
+            });
         }
     }"
     class="relative"
@@ -17,7 +20,7 @@
     @if($rosterPosition === 'FLEX' || in_array($entry->players()->find($currentPlayerId)->position, ['RB', 'WR', 'TE']))
     <button
         @click="showDropdown = !showDropdown"
-        class="px-3 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
+        class="px-3 py-1 mt-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
         Swap Player
     </button>
 
@@ -75,7 +78,7 @@
         x-show="showDropdown"
         @click.away="showDropdown = false"
         class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-[60] border"
-        style="transform: translateX(-50%);">
+        style="transform: translate(-50%,-30%);">
         <div class="p-4">
             <form wire:submit="swapPlayer">
                 <select
