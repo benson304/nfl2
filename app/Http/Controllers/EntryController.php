@@ -186,7 +186,7 @@ class EntryController extends Controller
             ->leftJoin('games',function($join) {
             $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and games.kickoff>ep2.created_at '),'=',\DB::raw('1'));
         })->where('entry_player.entry_id',$entry->id)->whereNotNull('entry_player.removed_at')->where('kickoff','>',now())->groupBy('ep2.player_id')->get();
-
+//
         $playersActive = $entry->current_players()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
             $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
         })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');
