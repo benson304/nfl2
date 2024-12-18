@@ -38,11 +38,11 @@
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ $entry->entry_name }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ $entry->user->name }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900 text-center">{{ $entry->getChangesRemaining() }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.wildcard_points'), 1) }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.divisional_points'), 1) }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.conference_points'), 1) }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.superbowl_points'), 1) }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.total_points'), 1) }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->getPointsByRound('Wild Card'), 1) }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->getPointsByRound('Divisional'), 1) }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->getPointsByRound('Conference'), 1) }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->getPointsByRound('Super Bowl'), 1) }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->total_points, 1) }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">
                                             <x-secondary-button class="ml-3 bg-blue-600 text-white hover:bg-blue-700 px-1 py-1 rounded" onclick="window.location.href='{{ route('entries.public.roster', $entry) }}'">
                                                 View Roster

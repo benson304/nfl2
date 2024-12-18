@@ -24,7 +24,7 @@
     <!-- Total Points Card -->
     <div class="px-4 py-6 bg-nfl-background border rounded-lg shadow flex items-center justify-between">
         <h3 class="text-lg font-medium">Total Points</h3>
-        <p class="mt-2 text-2xl font-bold">{{ $totalPoints }}</p>
+        <p class="mt-2 text-2xl font-bold">{{ $entry->total_points }}</p>
     </div>
 
     <!-- Changes Remaining Card -->

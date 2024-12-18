@@ -36,6 +36,24 @@ class Entry extends Model
         return $this->hasMany(PlayerChangeHistory::class);
     }
 
+    public function getTotalPointsAttribute()
+    {
+        return($this->select('entries.id as id','players.name as name','teams.name as team')->leftJoin('entry_player', 'entries.id', '=', 'entry_player.entry_id')
+            ->leftJoin('players', 'entry_player.player_id', '=', 'players.id')
+            ->leftJoin('teams', 'players.team_id', '=', 'teams.id')
+            ->leftJoin('games',function($join) {
+                $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
+            })
+            ->leftJoin('player_stats',function($join) {
+                $join->on('players.id', '=', 'player_stats.player_id')
+                    ->on('games.id', '=', 'player_stats.game_id');
+            })->where('entries.id',$this->id)->whereRaw('entry_player.created_at < games.kickoff')
+            ->where(function ($query) {
+                $query->whereNull('entry_player.removed_at')
+                    ->orWhereRaw('entry_player.removed_at > games.kickoff');
+            })
+            ->sum('player_stats.points'));
+    }
     public function calculateTotalPoints(): float
     {
         $scoringService = new \App\Services\ScoringService();
@@ -45,6 +63,28 @@ class Entry extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getPointsByRound($round)
+    {
+        $points=Entry::select('entries.id as id','players.name as name','teams.name as team')->leftJoin('entry_player', 'entries.id', '=', 'entry_player.entry_id')
+            ->leftJoin('players', 'entry_player.player_id', '=', 'players.id')
+            ->leftJoin('teams', 'players.team_id', '=', 'teams.id')
+            ->leftJoin('games',function($join) {
+                $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
+            })
+            ->leftJoin('player_stats',function($join) {
+                $join->on('players.id', '=', 'player_stats.player_id')
+                    ->on('games.id', '=', 'player_stats.game_id');
+            })->where('entries.id',$this->id)->where('games.round',$round)
+            ->whereRaw('entry_player.created_at < games.kickoff')
+            ->where(function ($query) {
+                $query->whereNull('entry_player.removed_at')
+                    ->orWhereRaw('entry_player.removed_at > games.kickoff');
+            })->sum('player_stats.points');
+
+        return($points??0);
+
     }
 
     public function getPlayerPoints($player_id,$round)

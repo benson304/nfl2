@@ -110,12 +110,24 @@
                                 <span class="text-lg font-bold">{{ number_format($entry->total_points, 1) }} pts</span>
                             </div>
                             <div class="space-y-2">
-                                @foreach($entry->weekly_points as $week => $points)
+{{--                                @foreach($entry->weekly_points as $week => $points)--}}
                                     <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Week {{ $week }}</span>
-                                        <span class="font-medium">{{ number_format($points, 1) }} pts</span>
+                                        <span class="text-gray-600">Wild Card</span>
+                                        <span class="font-medium">{{ number_format($entry->getPointsByRound('Wild Card'), 1) }} pts</span>
                                     </div>
-                                @endforeach
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Divisional</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Divisional'), 1) }} pts</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Conference</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Conference'), 1) }} pts</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Super Bowl</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Super Bowl'), 1) }} pts</span>
+                                </div>
+{{--                                @endforeach--}}
                             </div>
                         </div>
                     @endforeach
