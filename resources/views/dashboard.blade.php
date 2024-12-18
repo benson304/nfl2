@@ -29,7 +29,7 @@
                     <div class="bg-nfl-accent border border-nfl-accent/20 p-4 rounded-lg">
                         <div class="text-lg font-semibold text-white mb-4">Changes Remaining</div>
                         <div class="text-3xl font-bold text-white">
-                            {{ $entries->min('changes_remaining') ?? 2 }} / 2
+                            This does not make sense here.
                         </div>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
 
                                 <div class="mt-4 flex justify-between items-center">
                                     <span class="text-sm text-gray-600">
-                                        Changes remaining: {{ $entry->changes_remaining }}
+                                        Changes remaining: {{ $entry->getChangesRemaining() }}
                                     </span>
                                     <div class="inline-flex -space-x-px overflow-hidden rounded-md border bg-nfl-primary shadow-sm">
                                         <a href="{{ route('entries.roster', $entry) }}" class="inline-block px-4 py-2 text-sm font-medium text-white hover:bg-red-500 focus:relative"> Manage Roster</a>

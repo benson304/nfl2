@@ -10,6 +10,9 @@
                 this.dialogMessage = data[0].message;
                 this.showDialog = true;
             });
+            this.$wire.on('hideDropdown', (data) => {
+                this.showDropdown = false;
+            });
         }
     }"
     class="relative"
@@ -74,7 +77,7 @@
     x-show="showDropdown"
     @click.away="showDropdown = false"
     class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-[60] border"
-    style="transform: translateX(-50%);">
+    style="transform: translate(-50%,-30%);">
         <div class="p-4">
             <form wire:submit="changePlayer">
                 <select

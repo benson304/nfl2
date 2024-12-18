@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Livewire\PositionSwapper;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use App\View\Components\AdminLayout;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Livewire::component('player-selector', PlayerSelector::class);
+        Livewire::component('position-swapper', PositionSwapper::class);
         Livewire::component('admin.modals.bulk-stats-update', BulkStatsUpdate::class);
         Blade::component('admin-layout', AdminLayout::class);
     }

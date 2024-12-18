@@ -105,7 +105,7 @@
                     <th class="px-4 py-2">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white divide-y divide-gray-300">
             @foreach($entry->players->sortBy(function($player) {
                 $positionOrder = [
                     'QB' => 1,
@@ -122,7 +122,7 @@
                 return is_null($player->pivot->removed_at) ?0 :1;
             }) as $player)
 
-                    <tr class="text-center {{!is_null($player->pivot->removed_at)?' bg-red-200':(!$playersActive->contains($player->id)?'bg-gray-200':'')}}" x-data="{ showDropdown: false, loading: false }">
+                    <tr class="text-center {{!is_null($player->pivot->removed_at)?' bg-red-200':(!$playersActive->contains($player->id)?'bg-gray-100':'')}}" x-data="{ showDropdown: false, loading: false }">
                         <td class="px-6 py-4 whitespace-nowrap capitalize">{{ $player->pivot->roster_position }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             {{ $player->name }} ({{ $player->team->name }})
@@ -130,8 +130,8 @@
                                 <span class="block text-xs">Added: {{$transactions->firstWhere('dropped_player_id',$player->id)->addedPlayer->name}} ({{$transactions->firstWhere('dropped_player_id',$player->id)->created_at->format('m/d/Y g:i a')}})</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $entry->getPlayerPoints($player->id,'Wild Card') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? $entry->getPlayerPoints($player->id,'Divisional'):'' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($entry->getPlayerPoints($player->id,'Wild Card'), 1) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($entry->getPlayerPoints($player->id,'Divisional'), 1):'' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($player->getPoints('Conference'), 1):''  }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($player->getPoints('Super Bowl'), 1):''  }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($player->pivot->total_points, 1):''  }}</td>
@@ -152,7 +152,7 @@
                                 </div>
 
                                 @endif
-                                    @if(is_null($player->pivot->removed_at) && !in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
+                                    @if($player->pivot->roster_position=='FLEX'&&is_null($player->pivot->removed_at) && !in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
                                         <div>
                                             <livewire:position-swapper
                                                 :entry="$entry"

@@ -20,12 +20,13 @@
                                 <th class="px-4 py-2">Rank</th>
                                 <th class="px-4 py-2">Entry Name</th>
                                 <th class="px-4 py-2">Owner</th>
-                                <th class="px-4 py-2">Wildcard Points</th>
-                                <th class="px-4 py-2">Divisional Points</th>
-                                <th class="px-4 py-2">Conference Points</th>
-                                <th class="px-4 py-2">Superbowl Points</th>
-                                <th class="px-4 py-2">Total Points</th>
-                                <th class="px-4 py-2">Actions</th>  <!-- New column -->
+                                <th class="px-4 py-2">Changes Left</th>
+                                <th class="px-4 py-2">Wildcard</th>
+                                <th class="px-4 py-2">Divisional</th>
+                                <th class="px-4 py-2">Conference</th>
+                                <th class="px-4 py-2">Superbowl</th>
+                                <th class="px-4 py-2">Total</th>
+                                <th class="px-4 py-2"></th>  <!-- New column -->
                             </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -36,16 +37,17 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ $entry->entry_name }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ $entry->user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900 text-center">{{ $entry->getChangesRemaining() }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.wildcard_points'), 1) }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.divisional_points'), 1) }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.conference_points'), 1) }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.superbowl_points'), 1) }}</td>
-                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.total_points'), 1) }}</td>  
+                                        <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">{{ number_format($entry->players->sum('pivot.total_points'), 1) }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">
                                             <x-secondary-button class="ml-3 bg-blue-600 text-white hover:bg-blue-700 px-1 py-1 rounded" onclick="window.location.href='{{ route('entries.public.roster', $entry) }}'">
                                                 View Roster
                                             </x-secondary-button>
-                                        </td>  
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
