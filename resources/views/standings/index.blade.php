@@ -20,13 +20,13 @@
                                 <th class="px-4 py-2">Rank</th>
                                 <th class="px-4 py-2">Entry Name</th>
                                 <th class="px-4 py-2">Owner</th>
-                                <th class="px-4 py-2">Changes Remaining</th>
-                                <th class="px-4 py-2">Wildcard Points</th>
-                                <th class="px-4 py-2">Divisional Points</th>
-                                <th class="px-4 py-2">Conference Points</th>
-                                <th class="px-4 py-2">Superbowl Points</th>
-                                <th class="px-4 py-2">Total Points</th>
-                                <th class="px-4 py-2">Actions</th>  <!-- New column -->
+                                <th class="px-4 py-2">Changes Left</th>
+                                <th class="px-4 py-2">Wildcard</th>
+                                <th class="px-4 py-2">Divisional</th>
+                                <th class="px-4 py-2">Conference</th>
+                                <th class="px-4 py-2">Superbowl</th>
+                                <th class="px-4 py-2">Total</th>
+                                <th class="px-4 py-2"></th>  <!-- New column -->
                             </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
