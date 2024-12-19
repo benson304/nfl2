@@ -116,7 +116,6 @@ class EntryController extends Controller
 
     public function roster(Entry $entry)
     {
-
         if ($entry->user_id !== auth()->id()) {
             abort(403);
         }

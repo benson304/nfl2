@@ -2,11 +2,11 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\EntryPlayer;
 use App\Models\Game;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Player;
-use App\Models\PlayerChangeHistory;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 
@@ -127,56 +127,64 @@ class PlayerSelector extends Component
             \DB::transaction(function () {
                 $now = now();
 
-                //Update current player removed_at
-                $this->entry->players()->newPivotStatement()
-                ->where('entry_id', $this->entry->id)
-                ->where('player_id', $this->currentPlayerId)
-                ->update(['removed_at' => $now]);
+                //if games started track changes else allow unlimited changes
+                if(Game::where('kickoff', '<=', Carbon::now())->first()) {
 
-                $this->entry->players()->attach($this->selectedPlayerId, [
-                    'roster_position' => $this->rosterPosition
-                ]);
+                    //Update current player removed_at
+                    $this->entry->players()->newPivotStatement()
+                        ->where('entry_id', $this->entry->id)
+                        ->where('player_id', $this->currentPlayerId)
+                        ->update(['removed_at' => $now]);
 
-                // Get the current player data before detaching
-//                $currentPlayerPivot = $this->entry->players()
-//                    ->where('players.id', $this->currentPlayerId)
-//                    ->first()
-//                    ->pivot;
-//
-//                // Save to entry_player_history before detaching (for stats tracking)
-//                DB::table('entry_player_history')->insert([
-//                    'entry_id' => $this->entry->id,
-//                    'player_id' => $this->currentPlayerId,
-//                    'roster_position' => $this->rosterPosition,
-//                    'wildcard_points' => $currentPlayerPivot->wildcard_points ?? 0.0,
-//                    'divisional_points' => $currentPlayerPivot->divisional_points ?? 0.0,
-//                    'conference_points' => $currentPlayerPivot->conference_points ?? 0.0,
-//                    'superbowl_points' => $currentPlayerPivot->superbowl_points ?? 0.0,
-//                    'total_points' => $currentPlayerPivot->total_points ?? 0.0,
-//                    'removed_at' => $now,
-//                    'created_at' => $now,
-//                    'updated_at' => $now
-//                ]);
+                    $this->entry->players()->attach($this->selectedPlayerId, [
+                        'roster_position' => $this->rosterPosition
+                    ]);
 
-//                // Detach and attach players
-//                $this->entry->players()->detach($this->currentPlayerId);
-//                $this->entry->players()->attach($this->selectedPlayerId, [
-//                    'roster_position' => $this->rosterPosition
-//                ]);
-//
-                // Create single transaction record
-                Transaction::create([
-                    'entry_id' => $this->entry->id,
-                    'dropped_player_id' => $this->currentPlayerId,
-                    'added_player_id' => $this->selectedPlayerId,
-                    'roster_position' => $this->rosterPosition,
-                    'processed_at' => $now
-                ]);
+                    // Get the current player data before detaching
+                    //                $currentPlayerPivot = $this->entry->players()
+                    //                    ->where('players.id', $this->currentPlayerId)
+                    //                    ->first()
+                    //                    ->pivot;
+                    //
+                    //                // Save to entry_player_history before detaching (for stats tracking)
+                    //                DB::table('entry_player_history')->insert([
+                    //                    'entry_id' => $this->entry->id,
+                    //                    'player_id' => $this->currentPlayerId,
+                    //                    'roster_position' => $this->rosterPosition,
+                    //                    'wildcard_points' => $currentPlayerPivot->wildcard_points ?? 0.0,
+                    //                    'divisional_points' => $currentPlayerPivot->divisional_points ?? 0.0,
+                    //                    'conference_points' => $currentPlayerPivot->conference_points ?? 0.0,
+                    //                    'superbowl_points' => $currentPlayerPivot->superbowl_points ?? 0.0,
+                    //                    'total_points' => $currentPlayerPivot->total_points ?? 0.0,
+                    //                    'removed_at' => $now,
+                    //                    'created_at' => $now,
+                    //                    'updated_at' => $now
+                    //                ]);
 
-                //if any games started decrease changes remaining.   If no games started unlimited changes allowed.
-                if($gamesStarted = Game::where('kickoff', '<=', Carbon::now())->first()) {
-                    $this->entry->decrement('changes_remaining');
+                    //                // Detach and attach players
+                    //                $this->entry->players()->detach($this->currentPlayerId);
+                    //                $this->entry->players()->attach($this->selectedPlayerId, [
+                    //                    'roster_position' => $this->rosterPosition
+                    //                ]);
+                    //
+                    // Create single transaction record
+                    Transaction::create([
+                        'entry_id' => $this->entry->id,
+                        'dropped_player_id' => $this->currentPlayerId,
+                        'added_player_id' => $this->selectedPlayerId,
+                        'roster_position' => $this->rosterPosition,
+                        'processed_at' => $now
+                    ]);
                 }
+                else
+                {
+                    //unlimited changes.
+                    $entryPlayer=EntryPlayer::where('entry_id', $this->entry->id)->where('player_id', $this->currentPlayerId)->firstorfail();
+                    $entryPlayer->player_id= $this->selectedPlayerId;
+                    $entryPlayer->save();
+                }
+
+
             });
 
             $this->dispatch('showDialog', [
