@@ -121,7 +121,9 @@
             })->sortBy(function($player) {
                 return is_null($player->pivot->removed_at) ?0 :1;
             }) as $player)
-
+                @php
+                    $playerTotalPoints=$entry->getPlayerPoints($player->id,'Wild Card')+$entry->getPlayerPoints($player->id,'Divisional')+$entry->getPlayerPoints($player->id,'Conference')+$entry->getPlayerPoints($player->id,'Super Bowl');
+                @endphp
                     <tr class="text-center {{!is_null($player->pivot->removed_at)?' bg-red-200':(!$playersActive->contains($player->id)?'bg-gray-100':'')}}" x-data="{ showDropdown: false, loading: false }">
                         <td class="px-6 py-4 whitespace-nowrap capitalize">{{ $player->pivot->roster_position }}</td>
                         <td class="px-6 py-4 whitespace-nowrap  text-left">
@@ -131,10 +133,10 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right">{{ number_format($entry->getPlayerPoints($player->id,'Wild Card'), 2) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ is_null($player->pivot->removed_at) ? number_format($entry->getPlayerPoints($player->id,'Divisional'), 2):'' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">{{ is_null($player->pivot->removed_at) ? number_format($player->getPoints('Conference'), 2):''  }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">{{ is_null($player->pivot->removed_at) ? number_format($player->getPoints('Super Bowl'), 2):''  }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">{{ is_null($player->pivot->removed_at) ? number_format($player->pivot->total_points, 2):''  }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ !is_null($player->getPoints('Divisional'))&&is_null($player->pivot->removed_at) ? number_format($entry->getPlayerPoints($player->id,'Divisional'), 2):'' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">{{ !is_null($player->getPoints('Conference'))&&is_null($player->pivot->removed_at) ? number_format($player->getPoints('Conference'), 2):''  }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">{{ !is_null($player->getPoints('Super B'))&&is_null($player->pivot->removed_at) ? number_format($player->getPoints('Super Bowl'), 2):''  }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right font-bold">{{ number_format($playerTotalPoints, 2) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-center relative">
                             @if(is_null($player->pivot->removed_at)&&!in_array($player->id, $lockedPlayers->pluck('id')->toArray()))
                                 @if($changesRemaining<=0)

@@ -71,10 +71,14 @@ class Player extends Model
 
     public function getPoints($round)
     {
-        $result=DB::table('games')->select('games.id','player_stats.points')
-            ->leftJoin('player_stats', 'games.id', '=', 'player_stats.game_id')
-            ->where('games.round',$round)->where('player_stats.player_id',$this->id)->first();
-        return($result->points??0);
+        if(Game::where('round', $round)->where('kickoff','<',now())->first())
+        {
+            $result=DB::table('games')->select('games.id','player_stats.points')
+                ->leftJoin('player_stats', 'games.id', '=', 'player_stats.game_id')
+                ->where('games.round',$round)->where('player_stats.player_id',$this->id)->first();
+            return($result->points??0);
+        }
+        return null;
 
     }
         public function calculateWeeklyScore($gameId): float
