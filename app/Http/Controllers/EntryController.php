@@ -349,68 +349,6 @@ class EntryController extends Controller
         }
     }
 
-    public function processTransaction(Request $request, Entry $entry)
-{
-    if ($entry->user_id !== auth()->id()) {
-        abort(403);
-    }
-
-    $validated = $request->validate([
-        'dropped_player_id' => 'required|exists:players,id',
-        'added_player_id' => 'required|exists:players,id',
-        'position' => 'required|string'
-    ]);
-
-    if ($entry->changes_remaining <= 0) {
-        throw ValidationException::withMessages([
-            'transaction' => ['No roster changes remaining for this entry.']
-        ]);
-    }
-
-    try {
-        DB::beginTransaction();
-
-        // First, save the history record for the dropped player with correct defaults
-        DB::table('entry_player_history')->insert([
-            'entry_id' => $entry->id,
-            'player_id' => $validated['dropped_player_id'],
-            'roster_position' => $validated['position'],
-            'wildcard_points' => 0.0,
-            'divisional_points' => 0.0,
-            'conference_points' => 0.0,
-            'superbowl_points' => 0.0,
-            'total_points' => 0.0,
-            'removed_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Now handle the player swap
-        $entry->players()->detach($validated['dropped_player_id']);
-        $entry->players()->attach($validated['added_player_id'], [
-            'roster_position' => $validated['position']
-        ]);
-
-        // Create the transaction record
-        Transaction::create([
-            'entry_id' => $entry->id,
-            'dropped_player_id' => $validated['dropped_player_id'],
-            'added_player_id' => $validated['added_player_id'],
-            'roster_position' => $validated['position'],
-            'processed_at' => now()
-        ]);
-
-        // Decrement changes remaining
-        $entry->decrement('changes_remaining');
-
-        DB::commit();
-        return redirect()->back()->with('success', 'Player changed successfully');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Failed to change player: ' . $e->getMessage());
-    }
-}
-
     private function validateRosterComposition(Entry $entry, string $newPosition, ?string $removedPosition = null)
     {
         $positions = $entry->players()

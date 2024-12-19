@@ -30,9 +30,10 @@ class PlayerSelector extends Component
         ->where('players.id', '!=', $this->currentPlayerId)
         ->pluck('players.id');
 
-    // Get previously dropped players from entry_player_history
-    $droppedPlayerIds = DB::table('entry_player_history')
+    // Get previously dropped players from entry_player
+    $droppedPlayerIds = DB::table('entry_player')
         ->where('entry_id', $this->entry->id)
+        ->whereNotNull('removed_at')
         ->pluck('player_id');
 
 
