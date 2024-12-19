@@ -1,6 +1,21 @@
 <x-app-layout>
 
-
+    <!-- Flash Messages -->
+    <!-- TODO: MAKE THIS BETTER AND MORE CONSISTENT THROUGHOUT -->
+    @if (session('success')||session('error'))
+    <div class="mb-4">
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('error') }}</span>
+            </div>
+        @endif
+    </div>
+    @endif
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Overview Section -->
@@ -9,7 +24,7 @@
                     <div class="bg-nfl-primary border border-nfl-primary/20 p-4 rounded-lg">
                         <div class="text-lg font-semibold text-white mb-4">Total Entries</div>
                         <div class="text-3xl font-bold text-white">{{ $entriesCount }} / 4</div>
-                        @if($remainingEntries > 0)
+                        @if($gamesStarted==0&&$remainingEntries > 0)
                             <a href="{{ route('entries.create') }}"
                                 class="inline-flex items-center justify-center px-4 py-2 bg-nfl-secondary text-white font-medium rounded-lg hover:bg-nfl-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-secondary/50 transition-colors mt-2">
                                 Add Entry (+{{ $remainingEntries }} remaining)
@@ -41,10 +56,12 @@
                 @if($entries->isEmpty())
                     <div class="text-center py-8">
                         <p class="text-gray-600 mb-4">You haven't created any entries yet.</p>
+                        @if($gamesStarted==0)
                         <a href="{{ route('entries.create') }}"
                         class="inline-flex items-center justify-center px-4 py-2 bg-nfl-primary text-white font-medium rounded-lg hover:bg-nfl-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-primary/50 transition-colors mt-2">
                                 Create Your First Entry
                         </a>
+                        @endif
                     </div>
                 @else
                     <div class="grid md:grid-cols-2 gap-6">

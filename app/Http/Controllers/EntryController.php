@@ -25,8 +25,11 @@ class EntryController extends Controller
             ->with(['players'])
             ->get();
 
+        $gamesStarted=Game::where('kickoff', '<=', Carbon::now())->count();
+
         return view('entries.index', [
-            'entries' => $entries
+            'entries' => $entries,
+            'gamesStarted' => $gamesStarted
         ]);
     }
 
@@ -106,6 +109,10 @@ class EntryController extends Controller
 
     public function create()
     {
+        $gamesStarted=Game::where('kickoff', '<=', Carbon::now())->count();
+        if($gamesStarted>0){
+            return redirect()->route('dashboard')->with('error', 'Entry deadline passed!');
+        }
         $players = Player::with('team')
         ->where('is_active', true)
         ->get()
@@ -235,7 +242,10 @@ class EntryController extends Controller
         if ($user->entries()->count() >= 4) {
             return back()->withErrors(['message' => 'You cannot create more than 4 entries.']);
         }
-
+        $gamesStarted=Game::where('kickoff', '<=', Carbon::now())->count();
+        if($gamesStarted>0){
+            return redirect()->route('dashboard')->with('error', 'Entry deadline passed!');
+        }
 
         $validator = Validator::make($request->all(), [
             'entry_name' => 'required|string|max:255',

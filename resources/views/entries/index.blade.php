@@ -4,7 +4,7 @@
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-nfl-background shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-nfl-background border-b border-gray-200">
-                    @if(auth()->user()->entries()->count() < 4)
+                    @if($gamesStarted==0&&auth()->user()->entries()->count() < 4)
                         <a href="{{ route('entries.create') }}" class="btn-primary">
                             Create New Entry
                         </a>

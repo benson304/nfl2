@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Game;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Services\ScoringService;
 
@@ -48,10 +50,13 @@ class DashboardController extends Controller
         $entriesCount = $entries->count();
         $remainingEntries = 4 - $entriesCount; // Max 4 entries per user
 
+        $gamesStarted=Game::where('kickoff', '<=', Carbon::now())->count();
+
         return view('dashboard', compact(
             'entries',
             'entriesCount',
-            'remainingEntries'
+            'remainingEntries',
+            'gamesStarted'
         ));
     }
 }
