@@ -131,17 +131,19 @@ class EntryController extends Controller
             $query->with('team')->with('stats')->select('players.*');
         }]);
 
-        // Get players that are locked (game has started and still games to play this weekend (assumes games only sat & sundays, 48hr window) )
+        // Get players that are locked (game has started and still games to play this weekend (assumes games only sat & sundays & mon, 72hr window) )
 
-        //Are there upcoming games (<48hrs) then check for locking players. This will unlock all players once the last games end sunday evening.
+        //Are there upcoming games (<72hrs) then check for locking players. This will unlock all players once the last games end sunday evening.
         $lockedPlayers = collect();
-        if($upcomingGames = Game::where('kickoff', '>=', Carbon::now())->where('kickoff', '<=', Carbon::now()->addDays(2)->toDateTimeString())->first()) {
+
+        if($upcomingGames = Game::where('kickoff', '>=', Carbon::now()->subDays(3)->toDateTimeString())
+            ->where('kickoff', '<=', Carbon::now()->addDay(2)->toDateTimeString())->where('kickoff', '>=', Carbon::now()->subHours(5)->toDateTimeString())->first()) {
             foreach ($entry->players as $player) {
                 $currentGame = Game::where(function ($query) use ($player) {
                     $query->where('home_team_id', $player->team_id)
                         ->orWhere('away_team_id', $player->team_id);
                 })
-                    ->where('kickoff', '<=', Carbon::now())->where('kickoff', '>=', Carbon::now()->subDays(2)->toDateTimeString())
+                    ->where('kickoff', '<=', Carbon::now())->where('kickoff', '>=', Carbon::now()->subDays(3)->toDateTimeString())
                     ->first();
 
                 if ($currentGame) {
