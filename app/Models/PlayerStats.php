@@ -13,6 +13,7 @@ class PlayerStats extends Model
     protected $fillable = [
         'player_id',
         'game_id',
+        'points',
         'passing_yards',
         'passing_tds',
         'interceptions',

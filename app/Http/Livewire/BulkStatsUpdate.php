@@ -80,6 +80,7 @@ class BulkStatsUpdate extends Component
                         'player_id' => (int)$record['player_id'],
                     ],
                     [
+                        'points' => ($record['points'] ?? 0),
                         'passing_yards' => ($record['passing_yards'] ?? 0),
                         'passing_tds' => ($record['passing_tds'] ?? 0),
                         'interceptions' => ($record['interceptions'] ?? 0),
