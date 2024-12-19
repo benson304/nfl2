@@ -126,7 +126,6 @@ class EntryController extends Controller
         if ($entry->user_id !== auth()->id()) {
             abort(403);
         }
-//        dd(EntryPlayer::select('removed_at')->get());
         $entry->load(['players' => function($query) {
             $query->with('team')->with('stats')->select('players.*');
         }]);
@@ -207,7 +206,7 @@ class EntryController extends Controller
             }
 
         }
-//dd($transactions);
+//dd($entry->active_players()->pluck('players.id'));
         $playersActive = $entry->current_players()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
             $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
         })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');

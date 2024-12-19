@@ -38,11 +38,25 @@ class DashboardController extends Controller
 //                    //return $stats->sum->calculatePoints();
 //                });
 
+            $entryActivePlayers=$entry->activePlayers();
             // Get the roster with positions for each entry
-            $entry->rosters = $entry->players->map(function ($player) use ($entry) {
+            $entry->rosters = $entry->current_players->sortBy(function($player) {
+                $positionOrder = [
+                    'QB' => 1,
+                    'WR1' => 2,
+                    'WR2' => 3,
+                    'WR3' => 4,
+                    'RB1' => 5,
+                    'RB2' => 6,
+                    'TE' => 7,
+                    'FLEX' => 8
+                ];
+                return $positionOrder[$player->pivot->roster_position] ?? 999;
+            })->map(function ($player) use ($entry,$entryActivePlayers) {
                 return (object)[
                     'player' => $player,
-                    'roster_position' => $player->pivot->position
+                    'is_active' => $entryActivePlayers->contains($player->id),
+                    'roster_position' => $player->pivot->roster_position
                 ];
             });
         });

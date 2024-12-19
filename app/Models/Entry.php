@@ -195,6 +195,20 @@ class Entry extends Model
             ->withPivot('removed_at')
             ->withTimestamps();
     }
+
+
+    //returns collection of player ids still active
+    public function activePlayers()
+    {
+        return $this->belongsToMany(Player::class, 'entry_player')
+            ->using(EntryPlayer::class)
+            ->whereNull('entry_player.removed_at')
+            ->withPivot('roster_position')
+            ->withPivot('removed_at')
+            ->withTimestamps()->leftJoin('teams', 'players.team_id', '=', 'teams.id')->leftJoin('games',function($join) {
+                $join->on(\DB::raw('( teams.id = games.home_team_id OR teams.id = games.away_team_id) and 1 '),'=',\DB::raw('1'));
+            })->whereRaw('(`games`.`winning_team_id` = `teams`.`id` OR `games`.`winning_team_id` = 0 OR `games`.`id` IS NULL)')->groupBy('players.id')->pluck('players.id');
+    }
     public function changed_players(): BelongsToMany
     {
         return $this->belongsToMany(Player::class, 'entry_player')

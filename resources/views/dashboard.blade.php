@@ -69,7 +69,7 @@
                             <div class="border rounded-lg p-4">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-xl font-semibold">{{ $entry->entry_name }}</h3>
-                                    <span class="text-lg font-bold">{{ $entry->total_points ?? 0 }} pts</span>
+                                    <span class="text-xl font-bold">{{ $entry->total_points ?? 0 }}<span class="ml-0.5 text-gray-400 text-base font-extralight">pts</span></span>
                                 </div>
 
                                 <div class="space-y-2">
@@ -77,7 +77,7 @@
                                         <div class="flex justify-between items-center">
                                             <div class="flex items-center">
                                                 <span class="w-12 text-gray-600">{{ $roster->roster_position }}</span>
-                                                <span>{{ $roster->player->name }}</span>
+                                                <span class="{{$roster->is_active===true?'':'line-through'}}">{{ $roster->player->name }}</span>
                                             </div>
                                             <span class="text-sm text-gray-600">{{ $roster->player->team->abbreviation }}</span>
                                         </div>
@@ -86,7 +86,10 @@
 
                                 <div class="mt-4 flex justify-between items-center">
                                     <span class="text-sm text-gray-600">
-                                        Changes remaining: {{ $entry->getChangesRemaining() }}
+                                        Players Active: {{ $entry->activePlayers()->count() }}
+                                    </span>
+                                    <span class="text-sm text-gray-600">
+                                        Changes Remaining: {{ $entry->getChangesRemaining() }}
                                     </span>
                                     <div class="inline-flex -space-x-px overflow-hidden rounded-md border bg-nfl-primary shadow-sm">
                                         <a href="{{ route('entries.roster', $entry) }}" class="inline-block px-4 py-2 text-sm font-medium text-white hover:bg-red-500 focus:relative"> Manage Roster</a>
@@ -122,27 +125,27 @@
                 <div class="grid gap-4 md:grid-cols-2">
                     @foreach($entries as $entry)
                         <div class="bg-white p-4 rounded-lg shadow">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-semibold">{{ $entry->entry_name }}</h4>
-                                <span class="text-lg font-bold">{{ number_format($entry->total_points, 1) }} pts</span>
+                            <div class="flex justify-between items-start mb-4">
+                                <h4 class="text-xl font-semibold">{{ $entry->entry_name }}</h4>
+                                <span class="text-lg font-bold">{{ $entry->total_points ?? 0 }}<span class="block leading-3 text-gray-400 text-sm font-extralight text-center">Points</span></span>
                             </div>
                             <div class="space-y-2">
 {{--                                @foreach($entry->weekly_points as $week => $points)--}}
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Wild Card</span>
-                                        <span class="font-medium">{{ number_format($entry->getPointsByRound('Wild Card'), 1) }} pts</span>
+                                        <span class="font-medium">{{ number_format($entry->getPointsByRound('Wild Card'), 2) }}</span>
                                     </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Divisional</span>
-                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Divisional'), 1) }} pts</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Divisional'), 2) }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Conference</span>
-                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Conference'), 1) }} pts</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Conference'), 2) }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Super Bowl</span>
-                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Super Bowl'), 1) }} pts</span>
+                                    <span class="font-medium">{{ number_format($entry->getPointsByRound('Super Bowl'), 2) }}</span>
                                 </div>
 {{--                                @endforeach--}}
                             </div>
